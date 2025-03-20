@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 //saved in the user's home directory
-#define FILENAME ".stackNEW.dat"
+#define FILENAME ".stack.dat"
 #define BASHRC ".bashrc"
 
 void spit_command(Stack *st);

@@ -5,6 +5,7 @@
 #define FILENAME ".stack.dat"
 #define BASHRC ".bashrc"
 
+
 void spit_command(Stack *st);
 void anchor(Stack *st);
 void display_anchors(Stack *st);

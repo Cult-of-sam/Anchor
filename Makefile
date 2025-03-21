@@ -1,20 +1,27 @@
+BINARY = anchor
 
-all: compile
+SOURCE_DIR = src
+OBJECT_DIR = obj
 
-#compiler and tools
-CC = gcc
-CFLAGS = -g -W
+#CC = clang
+CC_FLAGS = -Wall -Werror -I $(SOURCE_DIR) -g -W
 
-#source files
-SRCS = main.c functions.h functions.c stack.h stack.c
+SOURCES = $(wildcard $(SOURCE_DIR)/*.c)
+OBJECTS = $(patsubst $(SOURCE_DIR)/%.c, $(OBJECT_DIR)/%.o, $(SOURCES))
 
-#output binary
-TARGET = anchor
+.PHONY: all
+all: $(BINARY)
 
-compile:
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS)
+$(BINARY): $(OBJECTS) $(OBJECT_DIR)
+	$(CC) $(CC_FLAGS) $(OBJECTS) -o $@
 
-test:
-	#using "check" command line tool
+$(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c $(OBJECT_DIR)
+	$(CC) $(CC_FLAGS) -c $< -o $@
 
-#Create a dev docker environment tailored to developng in C
+$(OBJECT_DIR):
+	mkdir -p $@
+
+.PHONY: clean
+clean:
+	$(RM) -r $(OBJECT_DIR)
+	$(RM) $(BINARY)

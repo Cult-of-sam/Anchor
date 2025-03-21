@@ -1,4 +1,6 @@
 /.vscode
 /.direnv
+/obj
 .envrc
 flake.nix
+anchor

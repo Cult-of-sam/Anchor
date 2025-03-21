@@ -7,11 +7,10 @@
 #include "functions.h"
 
 
-void print_usage(bool err);
+void print_usage(bool err, const char *name);
 
 
 int main(int argc, const char **argv) {
-	int arguments = 0;
 	Stack st = init_stack();
 
 	// Default behavior for invocation with no arguments
@@ -44,7 +43,7 @@ int main(int argc, const char **argv) {
 }
 
 
-void print_usage(bool err, char *name) {
+void print_usage(bool err, const char *name) {
 	FILE *target = stdout;
 	if (err) target = stderr;
 

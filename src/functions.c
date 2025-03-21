@@ -1,5 +1,7 @@
 #include "functions.h"
 
+#include <stdlib.h>
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 
@@ -10,12 +12,14 @@ void spit_command(Stack *st) {
 	peek(st, anchor);
 
 	sprintf(command, "cd %s\n", anchor);
-	for(char *p = command; *p; ++p) ioctl(STDIN_FILENO, TIOCSTI, p);
+	for (char *p = command; *p; ++p) {
+		ioctl(STDIN_FILENO, TIOCSTI, p);
+	}
 }
 
 void anchor(Stack *st) {
 	char directory[100] = "\0";
-	if(getcwd(directory, sizeof(directory)) == NULL) {
+	if (getcwd(directory, sizeof(directory)) == NULL) {
 		perror("getcwd():");
 		exit(EXIT_FAILURE);
 	}
@@ -54,7 +58,7 @@ void switch_anchor(Stack *st, int index) {
 	strcpy(directory, st->stack[index]);
 
 	//shift the directories down one to the left to accomodate the most recent index chosen
-	for(int i = index; i < st->top; i++) {
+	for (int i = index; i < st->top; i++) {
 		strcpy(st->stack[i], st->stack[i+1]);
 	}
 	st->top -= 1;
@@ -68,25 +72,22 @@ void switch_anchor(Stack *st, int index) {
 
 
 void update_alias(Stack *st) {
+	char *format = "grep -q '^alias d=' ~/.bashrc && sed -i 's|^alias d=.*|alias d=\"cd %s\"|' ~/.bashrc || echo 'alias d=\"cd %s\"' >> ~/.bashrc";
 	*st = load_structure(FILENAME);
 
 	char directory[100] = "\0";
-	char command[150] = "\0";
-
 	peek(st, directory);
 
-	sprintf(
-		command,
-		"grep -q '^alias d=' ~/.bashrc && sed -i 's|^alias d=.*|alias d=\"cd %s\"|' ~/.bashrc || echo 'alias d=\"cd %s\"' >> ~/.bashrc",
-		directory,
-		directory
-	);
-
+	size_t command_len = snprintf(NULL, 0, format, directory, directory) + 1;
+	char *command = malloc(sizeof(char) * command_len);
+	snprintf(command, command_len, format, directory, directory);
 
 	//using bash idioms coupled with grep and sed
 	if (system(command) == -1) {
 		perror("System command failed:");
 		exit(EXIT_FAILURE);
 	}
+
+	free(command);
 } 
 
